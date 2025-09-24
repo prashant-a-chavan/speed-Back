@@ -91,5 +91,4 @@ public class SpeedbackService {
                 booking.getSlotNumber()
         );
     }
-
 }
