@@ -1,3 +1,58 @@
-# Project exclude paths
+# ===================================================================
+# IDE and System Files
+# ===================================================================
+
+# JetBrains IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Visual Studio Code
+.vscode/
+
+# macOS
+.DS_Store
+
+
+# ===================================================================
+# Java / Maven Build Artifacts
+# ===================================================================
+
+# The main build output directory
 /target/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Packaged applications
+*.jar
+*.war
+*.ear
+
+# Maven temporary files
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven.daemon.options
+
+# Java virtual machine crash logs
+hs_err_pid*
+
+# ===================================================================
+# Frontend Dependencies (Good practice if frontend is ever in the same repo)
+# ===================================================================
 /node_modules/
+/build/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

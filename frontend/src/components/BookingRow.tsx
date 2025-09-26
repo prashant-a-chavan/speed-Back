@@ -1,6 +1,6 @@
-import React from "react";
-import "./BookingRow.css";
-import { TeamMember, Booking } from "../types";
+import React from 'react';
+import './BookingRow.css';
+import { TeamMember, Booking } from '../types';
 
 interface BookingRowProps {
   member: TeamMember;
@@ -48,7 +48,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({
                 From: <strong>{bookingAsBookie.bookerName}</strong>
               </>
             ) : (
-              "-"
+              '-'
             )}
           </td>
         );

@@ -1,24 +1,29 @@
-import React, { useState, useEffect, useCallback } from "react";
-import "./App.css";
+import React, { useState, useEffect, useCallback } from 'react';
+import './App.css';
 
-import { TeamMember, Booking } from "./types";
+import { TeamMember, Booking } from './types';
 
-import { Modal } from "./components/Modal.tsx";
-import { BookingForm } from "./components/BookingForm.tsx";
-import { Dashboard } from "./components/Dashboard.tsx";
+import { Modal } from './components/Modal.tsx';
+import { BookingForm } from './components/BookingForm.tsx';
+import { Dashboard } from './components/Dashboard.tsx';
 
-import { getTeamMembers, getBookings, createBooking, removeBooking } from "./services/bookingService";
+import {
+  getTeamMembers,
+  getBookings,
+  createBooking,
+  removeBooking,
+} from './services/bookingService';
 
-import useWebSocket from "./hooks/useWebSocket.js";
+import useWebSocket from './hooks/useWebSocket.js';
 
-const WS_URL = "http://localhost:8080/ws";
+const WS_URL = 'http://localhost:8080/ws';
 
 export const App: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedBooker, setSelectedBooker] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleWebSocketMessage = useCallback((updatedBookings: Booking[]) => {
     setBookings(updatedBookings);
@@ -36,19 +41,19 @@ export const App: React.FC = () => {
         setTeamMembers(membersResponse.data);
         setBookings(bookingsResponse.data);
       } catch (error) {
-        console.error("Error fetching initial data:", error);
-        alert("Failed to load initial data from the server.");
+        console.error('Error fetching initial data:', error);
+        alert('Failed to load initial data from the server.');
       }
     };
     fetchData();
   }, []);
 
-  const handleBooking = async (bookingData: Omit<Booking, "id" | "bookerName" | "bookieName">) => {
+  const handleBooking = async (bookingData: Omit<Booking, 'id' | 'bookerName' | 'bookieName'>) => {
     try {
       await createBooking(bookingData);
     } catch (error: any) {
       const errorMessage = error.response?.data || error.message;
-      console.error("Error creating booking:", errorMessage);
+      console.error('Error creating booking:', errorMessage);
       setModalMessage(errorMessage);
       setIsModalOpen(true);
     }
@@ -59,15 +64,15 @@ export const App: React.FC = () => {
       await removeBooking(bookerId, slotNumber);
     } catch (error: any) {
       const errorMessage = error.response?.data || error.message;
-      console.error("Error removing booking:", errorMessage);
+      console.error('Error removing booking:', errorMessage);
       setModalMessage(errorMessage);
-      setIsModalOpen(true);    }
+      setIsModalOpen(true);
+    }
   };
 
-  const getAvailableBookies = useCallback((bookerId: number, currentSlot: number): TeamMember[] => {
-      const bookedByBooker = bookings
-        .filter((b) => b.bookerId === bookerId)
-        .map((b) => b.bookieId);
+  const getAvailableBookies = useCallback(
+    (bookerId: number, currentSlot: number): TeamMember[] => {
+      const bookedByBooker = bookings.filter((b) => b.bookerId === bookerId).map((b) => b.bookieId);
       const bookedBookiesInSlot = bookings
         .filter((b) => b.slotNumber === currentSlot)
         .map((b) => b.bookieId);
@@ -81,7 +86,8 @@ export const App: React.FC = () => {
           !bookedBookiesInSlot.includes(member.id) &&
           !bookedBookersInSlot.includes(member.id)
       );
-    }, [bookings, teamMembers]
+    },
+    [bookings, teamMembers]
   );
 
   return (
@@ -108,7 +114,7 @@ export const App: React.FC = () => {
         title="Booking Failed"
         type="error"
       >
-           <p>{modalMessage}</p>
+        <p>{modalMessage}</p>
       </Modal>
     </div>
   );

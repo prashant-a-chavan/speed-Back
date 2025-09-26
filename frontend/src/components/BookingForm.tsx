@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import "./BookingForm.css";
-import { TeamMember } from "../types";
+import React, { useState } from 'react';
+import './BookingForm.css';
+import { TeamMember } from '../types';
 
 interface BookingFormProps {
   teamMembers: TeamMember[];
   selectedBooker: number | null;
   setSelectedBooker: (id: number | null) => void;
-  handleBooking: (booking: {
-    bookerId: number;
-    bookieId: number;
-    slotNumber: number;
-  }) => void;
+  handleBooking: (booking: { bookerId: number; bookieId: number; slotNumber: number }) => void;
   getAvailableBookies: (bookerId: number, slotNumber: number) => TeamMember[];
 }
 
@@ -21,13 +17,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   handleBooking,
   getAvailableBookies,
 }) => {
-  const [selectedBookie, setSelectedBookie] = useState<number | "">("");
+  const [selectedBookie, setSelectedBookie] = useState<number | ''>('');
   const [selectedSlot, setSelectedSlot] = useState<number>(1);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (selectedBooker === null || selectedBookie === "") {
-      alert("Please select yourself and a team member to book.");
+    if (selectedBooker === null || selectedBookie === '') {
+      alert('Please select yourself and a team member to book.');
       return;
     }
 
@@ -37,7 +33,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       slotNumber: selectedSlot,
     });
 
-    setSelectedBookie("");
+    setSelectedBookie('');
   };
 
   return (
@@ -47,7 +43,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         <label>
           Your Name
           <select
-            value={selectedBooker ?? ""}
+            value={selectedBooker ?? ''}
             onChange={(e) => setSelectedBooker(e.target.value ? Number(e.target.value) : null)}
             required
           >
@@ -62,12 +58,11 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
         <label>
           Slot
-          <select
-            value={selectedSlot}
-            onChange={(e) => setSelectedSlot(Number(e.target.value))}
-          >
-            {[1, 2, 3].map(slotNum => (
-              <option key={slotNum} value={slotNum}>Slot {slotNum} (15 mins)</option>
+          <select value={selectedSlot} onChange={(e) => setSelectedSlot(Number(e.target.value))}>
+            {[1, 2, 3].map((slotNum) => (
+              <option key={slotNum} value={slotNum}>
+                Slot {slotNum} (15 mins)
+              </option>
             ))}
           </select>
         </label>
@@ -76,7 +71,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           Book Feedback With
           <select
             value={selectedBookie}
-            onChange={(e) => setSelectedBookie(e.target.value ? Number(e.target.value) : "")}
+            onChange={(e) => setSelectedBookie(e.target.value ? Number(e.target.value) : '')}
             required
             disabled={!selectedBooker}
           >

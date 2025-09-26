@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SpeedBackApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpeedBackApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(SpeedBackApplication.class, args);
+  }
 }
