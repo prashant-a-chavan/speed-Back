@@ -1,4 +1,4 @@
-package com.project.speedBack;
+package com.project.speedback;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,11 +1,11 @@
-package com.project.speedBack.service;
+package com.project.speedback.service;
 
-import com.project.speedBack.entity.Booking;
-import com.project.speedBack.entity.TeamMember;
-import com.project.speedBack.odt.BookingDTO;
-import com.project.speedBack.odt.BookingRequest;
-import com.project.speedBack.repository.BookingRepository;
-import com.project.speedBack.repository.TeamMemberRepository;
+import com.project.speedback.entity.Booking;
+import com.project.speedback.entity.TeamMember;
+import com.project.speedback.odt.BookingDTO;
+import com.project.speedback.odt.BookingRequest;
+import com.project.speedback.repository.BookingRepository;
+import com.project.speedback.repository.TeamMemberRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

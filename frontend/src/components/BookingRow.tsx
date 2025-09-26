@@ -1,6 +1,6 @@
 import React from "react";
 import "./BookingRow.css";
-import { TeamMember, Booking } from "../types"; // Import from the central types file
+import { TeamMember, Booking } from "../types";
 
 interface BookingRowProps {
   member: TeamMember;
@@ -15,7 +15,7 @@ export const BookingRow: React.FC<BookingRowProps> = ({
   currentBooker,
   onRemove,
 }) => {
-  const SLOTS = [1, 2, 3]; // Define constants to avoid "magic numbers"
+  const SLOTS = [1, 2, 3];
 
   return (
     <tr>
