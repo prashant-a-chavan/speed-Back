@@ -1,4 +1,4 @@
-package com.project.speedBack.entity;
+package com.project.speedback.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

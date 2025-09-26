@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./BookingForm.css";
-import { TeamMember } from "../types"; // Import from the central types file
+import { TeamMember } from "../types";
 
 interface BookingFormProps {
   teamMembers: TeamMember[];
@@ -37,7 +37,6 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       slotNumber: selectedSlot,
     });
 
-    // Reset only the local form state after submission
     setSelectedBookie("");
   };
 

@@ -1,6 +1,6 @@
-package com.project.speedBack.repository;
+package com.project.speedback.repository;
 
-import com.project.speedBack.entity.TeamMember;
+import com.project.speedback.entity.TeamMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 

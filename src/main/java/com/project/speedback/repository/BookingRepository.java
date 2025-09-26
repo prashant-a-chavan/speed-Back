@@ -1,6 +1,6 @@
-package com.project.speedBack.repository;
+package com.project.speedback.repository;
 
-import com.project.speedBack.entity.Booking;
+import com.project.speedback.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;

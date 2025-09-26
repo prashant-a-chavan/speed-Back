@@ -1,10 +1,8 @@
-package com.project.speedBack.entity;
+package com.project.speedback.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.lang.model.util.Elements;
 
 @Entity
 @Data
