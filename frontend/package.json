@@ -19,7 +19,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
+    "validate": "yarn format:check && yarn lint:check"
   },
   "eslintConfig": {
     "extends": [
@@ -38,5 +43,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
   }
 }

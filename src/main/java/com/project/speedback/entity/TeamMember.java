@@ -11,12 +11,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class TeamMember {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    public TeamMember(String name) {
-        this.name = name;
-    }
+  private String name;
+
+  public TeamMember(String name) {
+    this.name = name;
+  }
 }

@@ -25,7 +25,9 @@
   --transition-fast: all 0.2s ease-in-out;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -39,7 +41,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #ced4da; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}

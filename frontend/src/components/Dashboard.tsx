@@ -1,7 +1,7 @@
-import React from "react";
-import { BookingRow } from "./BookingRow.tsx";
-import "./Dashboard.css";
-import { TeamMember, Booking } from "../types"; // Import from the central types file
+import React from 'react';
+import { BookingRow } from './BookingRow.tsx';
+import './Dashboard.css';
+import { TeamMember, Booking } from '../types'; // Import from the central types file
 
 interface DashboardProps {
   teamMembers: TeamMember[];
