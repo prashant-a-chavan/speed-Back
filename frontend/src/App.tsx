@@ -1,10 +1,12 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom'; // Import routing components
 import './App.css';
 
 import { useSpeedback } from './hooks/useSpeedback.ts';
 import { Modal } from './components/Modal.tsx';
-import { BookingForm } from './components/BookingForm.tsx';
-import { Dashboard } from './components/Dashboard.tsx';
+import { Navbar } from './components/Navbar.tsx';
+import { DashboardPage } from './pages/DashboardPage.tsx';
+import { AboutPage } from './pages/AboutPage.tsx';
 
 export const App: React.FC = () => {
   const {
@@ -22,22 +24,25 @@ export const App: React.FC = () => {
 
   return (
     <div className="App">
-      <h1>Speed Back Dashboard</h1>
-      <div className="main-layout">
-        <BookingForm
-          teamMembers={teamMembers}
-          selectedBooker={selectedBooker}
-          setSelectedBooker={setSelectedBooker}
-          handleBooking={handleBooking}
-          getAvailableBookies={getAvailableBookies}
+      <Navbar />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <DashboardPage
+              teamMembers={teamMembers}
+              bookings={bookings}
+              selectedBooker={selectedBooker}
+              setSelectedBooker={setSelectedBooker}
+              handleBooking={handleBooking}
+              handleRemoveBooking={handleRemoveBooking}
+              getAvailableBookies={getAvailableBookies}
+            />
+          }
         />
-        <Dashboard
-          teamMembers={teamMembers}
-          bookings={bookings}
-          currentBooker={selectedBooker}
-          onRemove={handleRemoveBooking}
-        />
-      </div>
+        <Route path="/about" element={<AboutPage />} />
+      </Routes>
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
