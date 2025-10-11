@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,10 +19,15 @@ public class SpeedbackService {
   private final TeamMemberRepository teamMemberRepository;
   private final BookingRepository bookingRepository;
 
+  private final ModelMapper modelMapper;
+
   public SpeedbackService(
-      TeamMemberRepository teamMemberRepository, BookingRepository bookingRepository) {
+      TeamMemberRepository teamMemberRepository,
+      BookingRepository bookingRepository,
+      ModelMapper modelMapper) {
     this.teamMemberRepository = teamMemberRepository;
     this.bookingRepository = bookingRepository;
+    this.modelMapper = modelMapper;
   }
 
   public List<TeamMember> getAllTeamMembers() {
@@ -94,12 +100,6 @@ public class SpeedbackService {
   }
 
   private BookingDTO convertToDto(Booking booking) {
-    return new BookingDTO(
-        booking.getId(),
-        booking.getBooker().getId(),
-        booking.getBooker().getName(),
-        booking.getBookie().getId(),
-        booking.getBookie().getName(),
-        booking.getSlotNumber());
+    return modelMapper.map(booking, BookingDTO.class);
   }
 }
