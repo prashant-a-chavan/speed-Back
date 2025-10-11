@@ -1,5 +1,22 @@
 package com.project.speedback.service;
 
+import com.project.speedback.entity.Booking;
+import com.project.speedback.entity.TeamMember;
+import com.project.speedback.odt.BookingDTO;
+import com.project.speedback.odt.BookingRequest;
+import com.project.speedback.repository.BookingRepository;
+import com.project.speedback.repository.TeamMemberRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -7,32 +24,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.project.speedback.entity.Booking;
-import com.project.speedback.entity.TeamMember;
-import com.project.speedback.odt.BookingDTO;
-import com.project.speedback.odt.BookingRequest;
-import com.project.speedback.repository.BookingRepository;
-import com.project.speedback.repository.TeamMemberRepository;
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 @ExtendWith(MockitoExtension.class)
 class SpeedbackServiceTest {
 
   @Mock private TeamMemberRepository teamMemberRepository;
   @Mock private BookingRepository bookingRepository;
-  @InjectMocks private SpeedbackService speedbackService;
+  private SpeedbackService speedbackService;
 
   TeamMember teamMember;
 
   @BeforeEach
   void setUp() {
+    ModelMapper modelMapper = new ModelMapper();
+    speedbackService = new SpeedbackService(teamMemberRepository, bookingRepository, modelMapper);
+
     teamMember = TeamMember.builder().id(1L).name("Test").build();
   }
 
@@ -202,5 +207,24 @@ class SpeedbackServiceTest {
     assertEquals("No booking found for booker in this slot.", exception.getMessage());
     verify(bookingRepository, never()).delete(any());
     verify(bookingRepository, never()).save(any());
+  }
+
+  @Test
+  void shouldConvertBookingToDto() throws Exception {
+    Booking booking =
+        Booking.builder().id(1L).booker(teamMember).bookie(teamMember).slotNumber(2).build();
+
+    Method method = SpeedbackService.class.getDeclaredMethod("convertToDto", Booking.class);
+    method.setAccessible(true);
+
+    BookingDTO bookingDTO = (BookingDTO) method.invoke(speedbackService, booking);
+
+    assertNotNull(bookingDTO);
+    assertEquals(1L, bookingDTO.getId());
+    assertEquals(1L, bookingDTO.getBookerId());
+    assertEquals(1L, bookingDTO.getBookieId());
+    assertEquals("Test", bookingDTO.getBookerName());
+    assertEquals("Test", bookingDTO.getBookieName());
+    assertEquals(2, bookingDTO.getSlotNumber());
   }
 }
