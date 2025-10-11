@@ -1,12 +1,16 @@
 package com.project.speedback.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(
     uniqueConstraints = {
       @UniqueConstraint(columnNames = {"booker_id", "slotNumber"}),
