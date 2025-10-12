@@ -1,28 +1,28 @@
 package com.project.speedback.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
+
 import com.project.speedback.entity.Booking;
 import com.project.speedback.entity.TeamMember;
 import com.project.speedback.odt.BookingDTO;
 import com.project.speedback.odt.BookingRequest;
 import com.project.speedback.repository.BookingRepository;
 import com.project.speedback.repository.TeamMemberRepository;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SpeedbackServiceTest {
@@ -44,13 +44,13 @@ class SpeedbackServiceTest {
   @Test
   void shouldGetAllTeamMembers() {
 
-    when(teamMemberRepository.findAll()).thenReturn(List.of(teamMember));
+    given(teamMemberRepository.findAll()).willReturn(List.of(teamMember));
 
-    List<TeamMember> allMembers = speedbackService.getAllTeamMembers(); // Step 1
+    List<TeamMember> allMembers = speedbackService.getAllTeamMembers();
 
     assertEquals(1, allMembers.size());
     assertTrue(allMembers.contains(teamMember));
-    assertEquals("Test", allMembers.get(0).getName());
+    assertThat(allMembers.get(0).getName(), is(equalTo("Test")));
   }
 
   @Test
