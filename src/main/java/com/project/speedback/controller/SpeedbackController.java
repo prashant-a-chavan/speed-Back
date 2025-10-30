@@ -4,6 +4,7 @@ import com.project.speedback.entity.TeamMember;
 import com.project.speedback.odt.BookingDTO;
 import com.project.speedback.odt.BookingRequest;
 import com.project.speedback.service.SpeedbackService;
+import com.project.speedback.toggles.ServiceFeatures;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -110,6 +111,10 @@ public class SpeedbackController {
   @DeleteMapping("/bookings/{bookerId}/{slotNumber}")
   public ResponseEntity<?> deleteBooking(
       @PathVariable Long bookerId, @PathVariable int slotNumber) {
+
+    if (!ServiceFeatures.REMOVE_BOOKINGS.isActive()) {
+      return new ResponseEntity<>("Delete feature is currently disabled", HttpStatus.NOT_FOUND);
+    }
     try {
       speedbackService.deleteBooking(bookerId, slotNumber);
       messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
