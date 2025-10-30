@@ -55,6 +55,7 @@ export const AboutPage: React.FC = () => {
                 <li>PostgreSQL Database</li>
                 <li>Flyway for Database Migrations</li>
                 <li>Spring WebSockets (STOMP)</li>
+                <li>Feature Toggles</li>
               </ul>
             </div>
             <div className="tech-column">
