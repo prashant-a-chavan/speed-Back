@@ -130,5 +130,6 @@ The frontend uses Yarn/NPM scripts defined in `package.json`.
 Once the backend is running, you can access the live, interactive API documentation provided by Swagger UI.
 
 -   **Swagger UI URL**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+-   **Feature Toggles UI URL**: [http://localhost:8080/togglz-console/index](http://localhost:8080/togglz-console/index)
 
 ---
