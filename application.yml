@@ -37,3 +37,9 @@ management:
     web:
       exposure:
         include: 'togglz'
+
+speedback:
+  slots:
+    count: 3
+    duration-minutes: 15
+

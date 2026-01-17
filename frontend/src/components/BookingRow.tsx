@@ -1,12 +1,14 @@
-import React from 'react';
-import './BookingRow.css';
-import { TeamMember, Booking } from '../types';
+import React, { useMemo } from 'react';
+import { TeamMember, Booking, SlotConfig } from '../types';
+import { TableRow } from '@mui/material';
+import { TableCellContent } from './BookingCell.tsx';
 
 interface BookingRowProps {
   member: TeamMember;
   bookings: Booking[];
   currentBooker: number | null;
   onRemove: (bookerId: number, slotNumber: number) => void;
+  slotConfig: SlotConfig;
 }
 
 export const BookingRow: React.FC<BookingRowProps> = ({
@@ -14,45 +16,40 @@ export const BookingRow: React.FC<BookingRowProps> = ({
   bookings,
   currentBooker,
   onRemove,
+  slotConfig,
 }) => {
-  const SLOTS = [1, 2, 3];
+  const slots = useMemo(() => {
+    return Array.from({ length: slotConfig.count }, (_, i) => i + 1);
+  }, [slotConfig.count]);
+
+  const getBookingForSlot = (slot: number) => {
+    const bookingAsBooker = bookings.find((b) => b.bookerId === member.id && b.slotNumber === slot);
+    const bookingAsBookie = bookings.find((b) => b.bookieId === member.id && b.slotNumber === slot);
+
+    return { bookingAsBooker, bookingAsBookie };
+  };
+
+  const canCancelBooking = currentBooker === member.id;
 
   return (
-    <tr>
-      <td>{member.name}</td>
-      {SLOTS.map((slot) => {
-        const bookingAsBooker = bookings.find(
-          (b) => b.bookerId === member.id && b.slotNumber === slot
-        );
-        const bookingAsBookie = bookings.find(
-          (b) => b.bookieId === member.id && b.slotNumber === slot
-        );
+    <TableRow hover>
+      <TableCellContent variant="member" member={member} />
+
+      {slots.map((slot) => {
+        const { bookingAsBooker, bookingAsBookie } = getBookingForSlot(slot);
 
         return (
-          <td key={slot}>
-            {bookingAsBooker ? (
-              <>
-                To: <strong>{bookingAsBooker.bookieName}</strong>
-                {currentBooker === member.id && (
-                  <button
-                    onClick={() => onRemove(bookingAsBooker.bookerId, slot)}
-                    className="cancel-button"
-                    title={`Cancel booking with ${bookingAsBooker.bookieName}`}
-                  >
-                    X
-                  </button>
-                )}
-              </>
-            ) : bookingAsBookie ? (
-              <>
-                From: <strong>{bookingAsBookie.bookerName}</strong>
-              </>
-            ) : (
-              '-'
-            )}
-          </td>
+          <TableCellContent
+            key={slot}
+            variant="booking"
+            slot={slot}
+            bookingAsBooker={bookingAsBooker}
+            bookingAsBookie={bookingAsBookie}
+            canCancel={canCancelBooking}
+            onCancel={onRemove}
+          />
         );
       })}
-    </tr>
+    </TableRow>
   );
 };

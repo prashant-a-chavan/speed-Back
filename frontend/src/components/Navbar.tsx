@@ -1,24 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import './Navbar.css';
+import { NavbarContainer, StyledNavLink } from './Navbar.styles.ts';
+import { Typography } from '@mui/material';
 
 export const Navbar: React.FC = () => {
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <h1>Speed Back Dashboard</h1>
-      </div>
-      <div className="navbar-links">
-        <NavLink to="/" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          Dashboard
-        </NavLink>
-        <NavLink
-          to="/about"
-          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-        >
-          About
-        </NavLink>
-      </div>
-    </nav>
+    <NavbarContainer>
+      <Typography variant={'h5'} fontWeight={'600'}>
+        Speed Back Dashboard
+      </Typography>
+      <Typography sx={{ display: 'flex', gap: 2 }}>
+        <StyledNavLink to="/">Dashboard</StyledNavLink>
+        <StyledNavLink to="/about">About</StyledNavLink>
+      </Typography>
+    </NavbarContainer>
   );
 };

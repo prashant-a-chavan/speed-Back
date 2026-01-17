@@ -1,12 +1,12 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Import routing components
-import './App.css';
+import { Routes, Route } from 'react-router-dom';
 
 import { useSpeedback } from './hooks/useSpeedback.ts';
 import { Modal } from './components/Modal.tsx';
 import { Navbar } from './components/Navbar.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
 import { AboutPage } from './pages/AboutPage.tsx';
+import { AppContainer } from './App.styles.ts';
 
 export const App: React.FC = () => {
   const {
@@ -20,10 +20,21 @@ export const App: React.FC = () => {
     handleBooking,
     handleRemoveBooking,
     getAvailableBookies,
+    slotConfig,
   } = useSpeedback();
 
+  const getModalType = (message: string): 'error' | 'success' | 'info' => {
+    if (message.includes('Failed') || message.includes('not available')) {
+      return 'error';
+    }
+    if (message.includes('Successfully')) {
+      return 'success';
+    }
+    return 'info';
+  };
+
   return (
-    <div className="App">
+    <AppContainer>
       <Navbar />
       <Routes>
         <Route
@@ -37,6 +48,7 @@ export const App: React.FC = () => {
               handleBooking={handleBooking}
               handleRemoveBooking={handleRemoveBooking}
               getAvailableBookies={getAvailableBookies}
+              slotConfig={slotConfig}
             />
           }
         />
@@ -47,16 +59,10 @@ export const App: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Booking Information"
-        type={
-          modalMessage.includes('Failed') ||
-          modalMessage.includes('not available') ||
-          modalMessage.includes('already have a booking')
-            ? 'error'
-            : 'info'
-        }
+        type={getModalType(modalMessage)}
       >
         <p>{modalMessage}</p>
       </Modal>
-    </div>
+    </AppContainer>
   );
 };

@@ -1,25 +1,33 @@
 import React from 'react';
-import './AboutPage.css';
+import {
+  AboutPageLayout,
+  AboutCard,
+  AboutHeader,
+  AboutSection,
+  FeatureList,
+  TechStackContainer,
+  TechColumn,
+} from './AboutPage.styles';
 
 export const AboutPage: React.FC = () => {
   return (
-    <div className="about-page-layout">
-      <div className="about-card">
-        <div className="about-header">
+    <AboutPageLayout>
+      <AboutCard>
+        <AboutHeader>
           <h2>About SpeedBack</h2>
-        </div>
+        </AboutHeader>
 
-        <div className="about-section">
+        <AboutSection>
           <p>
             SpeedBack is a platform designed to simplify the process of scheduling feedback sessions
             within teams. It provides a clear, real-time overview of team members' availability and
             allows for quick and conflict-free bookings.
           </p>
-        </div>
+        </AboutSection>
 
-        <div className="about-section">
+        <AboutSection>
           <h3>How It Works</h3>
-          <ul className="feature-list">
+          <FeatureList>
             <li>
               <strong>View Availability:</strong> The main dashboard provides a real-time,
               grid-based view of all team members and their availability across the three designated
@@ -40,14 +48,14 @@ export const AboutPage: React.FC = () => {
               cancellations are reflected on everyone's dashboard instantly, without needing to
               refresh the page.
             </li>
-          </ul>
-        </div>
+          </FeatureList>
+        </AboutSection>
 
-        <div className="about-section">
+        <AboutSection>
           <h3>Technology Stack</h3>
           <p>This application is built using a modern, robust technology stack:</p>
-          <div className="tech-stack-container">
-            <div className="tech-column">
+          <TechStackContainer>
+            <TechColumn>
               <h4>Backend</h4>
               <ul>
                 <li>Spring Boot</li>
@@ -57,8 +65,8 @@ export const AboutPage: React.FC = () => {
                 <li>Spring WebSockets (STOMP)</li>
                 <li>Feature Toggles</li>
               </ul>
-            </div>
-            <div className="tech-column">
+            </TechColumn>
+            <TechColumn>
               <h4>Frontend</h4>
               <ul>
                 <li>React (with TypeScript)</li>
@@ -67,10 +75,10 @@ export const AboutPage: React.FC = () => {
                 <li>Prettier & ESLint for Code Quality</li>
                 <li>Swagger for API Documentation</li>
               </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </TechColumn>
+          </TechStackContainer>
+        </AboutSection>
+      </AboutCard>
+    </AboutPageLayout>
   );
 };

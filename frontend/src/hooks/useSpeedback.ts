@@ -5,8 +5,9 @@ import {
   createBooking,
   removeBooking,
 } from '../services/bookingService';
+import { getSlotConfiguration } from '../services/configService.ts';
 import useWebSocket from './useWebSocket.js';
-import { TeamMember, Booking } from '../types';
+import { TeamMember, Booking, SlotConfig } from '../types';
 
 const WS_URL = 'http://localhost:8080/ws';
 
@@ -21,11 +22,13 @@ interface UseSpeedbackReturn {
   handleBooking: (bookingData: Omit<Booking, 'id' | 'bookerName' | 'bookieName'>) => Promise<void>;
   handleRemoveBooking: (bookerId: number, slotNumber: number) => Promise<void>;
   getAvailableBookies: (bookerId: number, currentSlot: number) => TeamMember[];
+  slotConfig: SlotConfig;
 }
 
 export const useSpeedback = (): UseSpeedbackReturn => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [slotConfig, setSlotConfig] = useState<SlotConfig>({ count: 3, durationMinutes: 15 });
 
   const [selectedBooker, setSelectedBooker] = useState<number | null>(null);
 
@@ -41,12 +44,14 @@ export const useSpeedback = (): UseSpeedbackReturn => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [membersResponse, bookingsResponse] = await Promise.all([
+        const [membersResponse, bookingsResponse, configResponse] = await Promise.all([
           getTeamMembers(),
           getBookings(),
+          getSlotConfiguration(),
         ]);
         setTeamMembers(membersResponse.data);
         setBookings(bookingsResponse.data);
+        setSlotConfig(configResponse);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         setModalMessage('Failed to load initial data from the server.');
@@ -57,8 +62,27 @@ export const useSpeedback = (): UseSpeedbackReturn => {
   }, []);
 
   const handleBooking = async (bookingData: Omit<Booking, 'id' | 'bookerName' | 'bookieName'>) => {
+    const bookerAlreadyBooked = bookings.find(
+      (b) => b.bookieId === bookingData.bookerId && b.slotNumber === bookingData.slotNumber
+    );
+
+    if (bookerAlreadyBooked) {
+      const bookerWho = teamMembers.find((m) => m.id === bookerAlreadyBooked.bookerId);
+      const bookerWhoName = bookerWho ? bookerWho.name : 'another user';
+      setModalMessage(
+        `You are already booked for slot ${bookingData.slotNumber} by ${bookerWhoName}.`
+      );
+      setIsModalOpen(true);
+      return;
+    }
+
     try {
       await createBooking(bookingData);
+
+      const bookieName =
+        teamMembers.find((m) => m.id === bookingData.bookieId)?.name || 'team member';
+      setModalMessage(`Successfully booked ${bookieName} for slot ${bookingData.slotNumber}!`);
+      setIsModalOpen(true);
     } catch (error: any) {
       const errorMessage = error.response?.data || 'An unexpected error occurred.';
       console.error('Error creating booking:', errorMessage);
@@ -110,5 +134,6 @@ export const useSpeedback = (): UseSpeedbackReturn => {
     handleBooking,
     handleRemoveBooking,
     getAvailableBookies,
+    slotConfig,
   };
 };

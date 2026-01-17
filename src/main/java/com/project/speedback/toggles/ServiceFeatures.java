@@ -11,6 +11,7 @@ public enum ServiceFeatures implements Feature {
   @Label("Remove bookings")
   REMOVE_BOOKINGS;
 
+  @Override
   public boolean isActive() {
     return FeatureContext.getFeatureManager().isActive(this);
   }
