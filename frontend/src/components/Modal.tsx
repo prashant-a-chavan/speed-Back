@@ -1,38 +1,63 @@
-import React from 'react';
-import './Modal.css';
+import React, { FC, ReactNode } from 'react';
+import {
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalOkButton,
+  ModalIconWrapper,
+} from './Modal.styles.ts';
+import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import { Grid, Typography } from '@mui/material';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   type?: 'error' | 'success' | 'info';
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, type }) => {
+export const Modal: FC<ModalProps> = ({ isOpen, onClose, title, children, type }) => {
   if (!isOpen) {
     return null;
   }
 
+  function getIcon(type: string) {
+    switch (type) {
+      case 'error':
+        return <ErrorOutlineOutlinedIcon />;
+      case 'info':
+        return <InfoOutlineIcon />;
+      case 'success':
+        return <CheckCircleOutlinedIcon />;
+      default:
+        return <p>...</p>;
+    }
+  }
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2 className="modal-title">{title}</h2>
-          <button className="modal-close-button" onClick={onClose} title="Close">
+    <ModalOverlay onClick={onClose}>
+      <ModalContent onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <Typography variant="h6" fontWeight="600">
+            {title}
+          </Typography>
+          <ModalCloseButton onClick={onClose} title="Close">
             &times;
-          </button>
-        </div>
-        <div className="modal-body">
-          {type && <div className={`modal-icon ${type}`}></div>}
+          </ModalCloseButton>
+        </ModalHeader>
+        <ModalBody>
+          <ModalIconWrapper type={type}>{getIcon(type ?? '')}</ModalIconWrapper>
           <div>{children}</div>
-        </div>
-        <div className="modal-footer">
-          <button className="modal-ok-button" onClick={onClose}>
-            OK
-          </button>
-        </div>
-      </div>
-    </div>
+        </ModalBody>
+        <Grid display="flex" justifyContent="flex-end">
+          <ModalOkButton onClick={onClose}>OK</ModalOkButton>
+        </Grid>
+      </ModalContent>
+    </ModalOverlay>
   );
 };

@@ -11,3 +11,8 @@ export interface Booking {
   bookerName: string;
   bookieName: string;
 }
+
+export interface SlotConfig {
+  count: number;
+  durationMinutes: number;
+}

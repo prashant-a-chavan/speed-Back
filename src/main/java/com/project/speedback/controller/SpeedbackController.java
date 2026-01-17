@@ -1,8 +1,10 @@
 package com.project.speedback.controller;
 
+import com.project.speedback.config.SlotConfiguration;
 import com.project.speedback.entity.TeamMember;
 import com.project.speedback.odt.BookingDTO;
 import com.project.speedback.odt.BookingRequest;
+import com.project.speedback.odt.SlotConfigDTO;
 import com.project.speedback.service.SpeedbackService;
 import com.project.speedback.toggles.ServiceFeatures;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,12 +28,16 @@ import org.springframework.web.bind.annotation.*;
 public class SpeedbackController {
 
   private final SpeedbackService speedbackService;
-  private final SimpMessagingTemplate messagingTemplate; // For sending WebSocket messages
+  private final SimpMessagingTemplate messagingTemplate;
+  private final SlotConfiguration slotConfiguration;
 
   public SpeedbackController(
-      SpeedbackService speedbackService, SimpMessagingTemplate messagingTemplate) {
+      SpeedbackService speedbackService,
+      SimpMessagingTemplate messagingTemplate,
+      SlotConfiguration slotConfiguration) {
     this.speedbackService = speedbackService;
     this.messagingTemplate = messagingTemplate;
+    this.slotConfiguration = slotConfiguration;
   }
 
   @Operation(
@@ -47,6 +53,21 @@ public class SpeedbackController {
   @GetMapping("/team-members")
   public List<TeamMember> getAllTeamMembers() {
     return speedbackService.getAllTeamMembers();
+  }
+
+  @Operation(
+      summary = "Get slot configuration",
+      description = "Retrieves the current slot configuration including count and duration.")
+  @ApiResponse(
+      responseCode = "200",
+      description = "Successfully retrieved slot configuration",
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = SlotConfigDTO.class)))
+  @GetMapping("/config/slots")
+  public SlotConfigDTO getSlotConfiguration() {
+    return new SlotConfigDTO(slotConfiguration.getCount(), slotConfiguration.getDurationMinutes());
   }
 
   @Operation(

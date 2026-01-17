@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BookingRow } from './BookingRow.tsx';
-import './Dashboard.css';
-import { TeamMember, Booking } from '../types'; // Import from the central types file
+import { TeamMember, Booking, SlotConfig } from '../types';
+import { DashboardContainer, StyledTableHead } from './Dashboard.styles.ts';
+import { Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 
 interface DashboardProps {
   teamMembers: TeamMember[];
   bookings: Booking[];
   currentBooker: number | null;
   onRemove: (bookerId: number, slotNumber: number) => void;
+  slotConfig: SlotConfig;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -15,20 +17,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
   bookings,
   currentBooker,
   onRemove,
+  slotConfig,
 }) => {
+  const slots = useMemo(() => {
+    return Array.from({ length: slotConfig.count }, (_, i) => i + 1);
+  }, [slotConfig.count]);
+
   return (
-    <div className="dashboard">
-      <h2>Current Bookings</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Team Member</th>
-            <th>Slot 1</th>
-            <th>Slot 2</th>
-            <th>Slot 3</th>
-          </tr>
-        </thead>
-        <tbody>
+    <DashboardContainer>
+      <Typography variant="h5" fontWeight={600} mb={3}>
+        Current Bookings
+      </Typography>
+      <Table>
+        <StyledTableHead>
+          <TableRow>
+            <TableCell>Team Member</TableCell>
+            {slots.map((slot) => (
+              <TableCell key={slot}>Slot {slot}</TableCell>
+            ))}
+          </TableRow>
+        </StyledTableHead>
+        <TableBody>
           {teamMembers.map((member) => (
             <BookingRow
               key={member.id}
@@ -36,10 +45,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
               bookings={bookings}
               currentBooker={currentBooker}
               onRemove={onRemove}
+              slotConfig={slotConfig}
             />
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableBody>
+      </Table>
+    </DashboardContainer>
   );
 };
