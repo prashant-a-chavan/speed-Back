@@ -33,6 +33,9 @@
 *.war
 *.ear
 
+# Keep Gradle wrapper jar in VCS so CI can run ./gradlew.
+!gradle/wrapper/gradle-wrapper.jar
+
 
 # Java virtual machine crash logs
 hs_err_pid*
