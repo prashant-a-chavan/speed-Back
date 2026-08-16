@@ -1,32 +1,19 @@
-.PHONY: help format format-check build tests start setup
+.PHONY: help format check build
 
 help:
 	@echo "Available commands:"
-	@echo "  make format        - Apply code formatting to all Java files."
-	@echo "  make format-check  - Check if all Java files are correctly formatted."
-	@echo "  make build         - Build the Spring Boot application (includes format check)."
-	@echo "  make tests         - Run all tests."
-	@echo "  make start         - Start the Spring Boot application."
-	@echo "  make setup         - Configure git hooks and generate Gradle wrapper."
+	@echo "  make format   - Apply code formatting to all Java files."
+	@echo "  make check    - Check if all Java files are correctly formatted."
+	@echo "  make build    - Build the Spring Boot application (includes format check)."
 
 format:
 	@echo "Applying code formatting..."
-	./gradlew spotlessApply
+	./mvnw spotless:apply
 
-format-check:
+check:
 	@echo "Checking code formatting..."
-	./gradlew spotlessCheck
+	./mvnw spotless:check
 
 build:
 	@echo "Building the application..."
-	./gradlew clean build
-
-tests:
-	./gradlew test
-
-start:
-	./gradlew bootRun
-
-setup:
-	git config core.hooksPath .githooks
-	gradle wrapper
+	./mvnw clean install
