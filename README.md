@@ -21,7 +21,7 @@ The project is built with a modern, robust, and scalable technology stack.
 
 | Area         | Technology                                                                                   |
 |:-------------|:---------------------------------------------------------------------------------------------|
-| **Backend**  | **Spring Boot 3** (Java 17), Spring Data JPA, Spring WebSockets, Flyway, Swagger, PostgreSQL |
+| **Backend**  | **Spring Boot 3** (Java 25), Spring Data JPA, Spring WebSockets, Flyway, Swagger, PostgreSQL |
 | **Frontend** | **React 18** (TypeScript), React Router, Axios, Prettier, ESLint, Yarn/NPM                   |
 
 ---
@@ -33,8 +33,8 @@ Follow these instructions to get a local copy of the project up and running for 
 ### Prerequisites
 
 You will need the following software installed on your machine:
--   **Java 17** or later 
--   **Maven 3.8** or later
+-   **Java 25**
+-   **Gradle** (only needed once to generate wrapper if missing)
 -   **Node.js 18** or later
 -   **Yarn** or **NPM**
 -   **PostgreSQL 14** or later
@@ -73,9 +73,9 @@ First, set up and run the Spring Boot backend server.
     ```
 
 4.  **Run the Backend:**
-    The application uses the Maven Wrapper, so you don't need a local Maven installation. Flyway will automatically run the database migrations on the first startup.
+    The application uses the Gradle Wrapper, so you do not need a local Gradle installation after wrapper files are generated. Flyway will automatically run database migrations on first startup.
     ```bash
-    ./mvnw spring-boot:run
+    ./gradlew bootRun
     ```
     The backend server will start on `http://localhost:8080`.
 
@@ -111,8 +111,10 @@ Next, set up and run the React frontend.
 The backend uses a `Makefile` for convenient shortcuts.
 
 -   **`make format`**: Automatically formats all Java source code using Spotless.
--   **`make check`**: Checks if the code is formatted correctly (fails the build if not).
+-   **`make format-check`**: Checks if the code is formatted correctly.
 -   **`make build`**: Compiles the project, runs tests, and performs a format check.
+-   **`make tests`**: Runs backend tests.
+-   **`make start`**: Starts the backend.
 
 ### Frontend (`/frontend` directory)
 
@@ -129,7 +131,7 @@ The frontend uses Yarn/NPM scripts defined in `package.json`.
 
 Once the backend is running, you can access the live, interactive API documentation provided by Swagger UI.
 
--   **Swagger UI URL**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+-   **Swagger UI URL**: [http://localhost:8080/swagger](http://localhost:8080/swagger)
 
 ---
 
