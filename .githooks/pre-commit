@@ -1,0 +1,10 @@
+#!/bin/sh
+# Abort the commit if code is not formatted.
+
+if ! make format-check; then
+  echo ""
+  echo "❌ Commit aborted: code is not formatted."
+  echo "   Run 'make format' and then commit again."
+  echo ""
+  exit 1
+fi

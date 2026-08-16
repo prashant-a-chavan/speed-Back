@@ -48,6 +48,16 @@ buildNumber.properties
 hs_err_pid*
 
 # ===================================================================
+# Gradle Build Artifacts
+# ===================================================================
+
+# Gradle local cache and daemon files (machine-specific, regenerated automatically)
+.gradle/
+
+# Gradle build output
+/build/
+
+# ===================================================================
 # Frontend Dependencies (Good practice if frontend is ever in the same repo)
 # ===================================================================
 /node_modules/
