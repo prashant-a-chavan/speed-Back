@@ -70,7 +70,7 @@ tasks.named('check') {
 
 spotless {
     java {
-        googleJavaFormat('1.17.0').style('GOOGLE').reflowLongStrings()
+        googleJavaFormat('1.27.0').style('GOOGLE').reflowLongStrings()
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
