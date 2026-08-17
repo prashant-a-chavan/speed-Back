@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   backend:
@@ -58,10 +59,27 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Run backend tests
-        run: ./gradlew test
+        run: ./gradlew test --info
+
+      - name: Publish backend test report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Backend Test Results
+          path: build/test-results/test/*.xml
+          reporter: java-junit
+
+      - name: Upload backend test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            build/reports/tests/test
+            build/test-results/test
 
       - name: Build backend
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
   frontend:
     name: Frontend (React)
