@@ -64,8 +64,28 @@ tasks.named('test') {
     useJUnitPlatform()
 
     testLogging {
-        events 'failed'
+        events 'failed', 'skipped'
         exceptionFormat 'full'
+        showCauses true
+        showExceptions true
+        showStackTraces true
+    }
+
+    afterTest { descriptor, result ->
+        def status = switch (result.resultType) {
+            case org.gradle.api.tasks.testing.TestResult.ResultType.SUCCESS -> 'PASSED'
+            case org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE -> 'FAILED'
+            case org.gradle.api.tasks.testing.TestResult.ResultType.SKIPPED -> 'SKIPPED'
+        }
+        println("${descriptor.className} > ${descriptor.name} - ${status}")
+    }
+
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            logger.lifecycle(
+                    "Test summary: ${result.testCount} run, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped"
+            )
+        }
     }
 }
 

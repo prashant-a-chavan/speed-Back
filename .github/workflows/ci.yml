@@ -59,7 +59,7 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Run backend tests
-        run: ./gradlew test --info
+        run: ./gradlew test --console=plain
 
       - name: Publish backend test report
         if: always()
