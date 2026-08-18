@@ -1,4 +1,4 @@
-package com.project.speedback.odt;
+package com.project.speedback.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -8,10 +8,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.project.speedback.dto.BookingDTO;
+import com.project.speedback.dto.BookingRequest;
 import com.project.speedback.entity.Booking;
 import com.project.speedback.entity.TeamMember;
-import com.project.speedback.odt.BookingDTO;
-import com.project.speedback.odt.BookingRequest;
 import com.project.speedback.repository.BookingRepository;
 import com.project.speedback.repository.TeamMemberRepository;
 import java.lang.reflect.Method;
