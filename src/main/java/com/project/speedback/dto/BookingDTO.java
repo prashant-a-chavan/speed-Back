@@ -1,10 +1,12 @@
-package com.project.speedback.odt;
+package com.project.speedback.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Builder
 public class BookingDTO {
   private Long id;
   private Long bookerId;

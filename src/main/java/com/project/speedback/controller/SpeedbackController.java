@@ -1,10 +1,10 @@
 package com.project.speedback.controller;
 
 import com.project.speedback.config.SlotConfiguration;
+import com.project.speedback.dto.BookingDTO;
+import com.project.speedback.dto.BookingRequest;
+import com.project.speedback.dto.SlotConfigDTO;
 import com.project.speedback.entity.TeamMember;
-import com.project.speedback.odt.BookingDTO;
-import com.project.speedback.odt.BookingRequest;
-import com.project.speedback.odt.SlotConfigDTO;
 import com.project.speedback.service.SpeedbackService;
 import com.project.speedback.toggles.ServiceFeatures;
 import io.swagger.v3.oas.annotations.Operation;
