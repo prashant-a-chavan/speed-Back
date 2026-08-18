@@ -22,7 +22,7 @@ build:
 	./gradlew clean build
 
 tests:
-	./gradlew test
+	./gradlew clean test jacocoTestReport
 
 start:
 	./gradlew bootRun

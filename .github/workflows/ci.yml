@@ -61,6 +61,9 @@ jobs:
       - name: Run backend tests
         run: ./gradlew test --console=plain
 
+      - name: Enforce backend coverage gate (80%)
+        run: ./gradlew jacocoTestReport jacocoTestCoverageVerification --console=plain
+
       - name: Publish backend test report
         if: always()
         uses: dorny/test-reporter@v1
@@ -71,6 +74,15 @@ jobs:
 
       - name: Build backend
         run: ./gradlew clean build -x test
+
+      - name: Upload JaCoCo HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jacoco-html-report
+          path: build/reports/jacoco/test/html
+          if-no-files-found: warn
+          retention-days: 3
 
   frontend:
     name: Frontend (React)
