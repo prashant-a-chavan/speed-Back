@@ -20,8 +20,4 @@ public class TeamMember {
   private Long id;
 
   private String name;
-
-  public TeamMember(String name) {
-    this.name = name;
-  }
 }
