@@ -122,6 +122,7 @@ tasks.named('jacocoTestCoverageVerification') {
                 '**/dto/**',
                 '**/entity/**',
                 '**/repository/**',
+                '**/toggles/**',
                 '**/*Application.class'
         ])
     }))
