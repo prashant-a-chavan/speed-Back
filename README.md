@@ -78,30 +78,6 @@ First, set up and run the Spring Boot backend server.
     ./gradlew bootRun
     ```
     The backend server will start on `http://localhost:8080`.
-
-### 2. Frontend Setup
-
-Next, set up and run the React frontend.
-
-1.  **Navigate to the frontend directory:**
-    Open a **new terminal window** and navigate to the frontend folder.
-    ```bash
-    cd frontend
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    yarn install
-    # or: npm install
-    ```
-
-3.  **Run the Frontend:**
-    ```bash
-    yarn start
-    # or: npm start
-    ```
-    The frontend development server will start and open a browser window at `http://localhost:3000`.
-
 ---
 
 ## ⚙️ Available Scripts & Commands
@@ -115,15 +91,6 @@ The backend uses a `Makefile` for convenient shortcuts.
 -   **`make build`**: Compiles the project, runs tests, and performs a format check.
 -   **`make tests`**: Runs backend tests.
 -   **`make start`**: Starts the backend.
-
-### Frontend (`/frontend` directory)
-
-The frontend uses Yarn/NPM scripts defined in `package.json`.
-
--   **`yarn start`**: Runs the app in development mode.
--   **`yarn build`**: Builds the app for production.
--   **`yarn validate`**: Checks both code formatting (Prettier) and code quality (ESLint).
--   **`yarn fix`**: Automatically fixes all formatting and linting issues.
 
 ---
 
