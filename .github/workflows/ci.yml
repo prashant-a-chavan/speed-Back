@@ -7,15 +7,23 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
-  checks: write
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    name: Backend (Gradle)
+    name: Build
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      checks: write
     services:
       postgres:
         image: postgres:17
@@ -40,15 +48,17 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-          cache: gradle
 
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
       - name: Wait for PostgreSQL
         run: |
           for i in {1..30}; do
-            nc -z localhost 5433 && echo "Postgres is up" && exit 0
+            pg_is ready -h localhost -p 5433 -U postgres -d speedback_db && echo "Postgres is ready" && exit 0
             echo "Waiting for Postgres..."
             sleep 2
           done
@@ -73,7 +83,7 @@ jobs:
           reporter: java-junit
 
       - name: Build backend
-        run: ./gradlew clean build -x test
+        run: ./gradlew assemble --console=plain
 
       - name: Upload JaCoCo HTML report
         if: always()
