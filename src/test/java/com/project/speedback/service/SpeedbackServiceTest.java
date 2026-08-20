@@ -12,6 +12,8 @@ import com.project.speedback.dto.BookingDTO;
 import com.project.speedback.dto.BookingRequest;
 import com.project.speedback.entity.Booking;
 import com.project.speedback.entity.TeamMember;
+import com.project.speedback.exception.BookingConflictException;
+import com.project.speedback.exception.BookingNotFoundException;
 import com.project.speedback.repository.BookingRepository;
 import com.project.speedback.repository.TeamMemberRepository;
 import java.lang.reflect.Method;
@@ -95,6 +97,19 @@ class SpeedbackServiceTest {
   }
 
   @Test
+  void shouldThrowExceptionIfBookerIsSameAsBookie() {
+    BookingRequest bookingRequest =
+        BookingRequest.builder().bookerId(1L).bookieId(1L).slotNumber(3).build();
+
+    BookingConflictException exception =
+        assertThrows(
+            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
+
+    assertEquals("You cannot book a session with yourself.", exception.getMessage());
+    verify(bookingRepository, never()).save(any());
+  }
+
+  @Test
   void shouldThrowExceptionIfBookerAlreadyHasBooking() {
     BookingRequest bookingRequest =
         BookingRequest.builder().bookerId(1L).bookieId(2L).slotNumber(3).build();
@@ -107,9 +122,9 @@ class SpeedbackServiceTest {
     when(bookingRepository.findByBookerIdAndSlotNumber(anyLong(), anyInt()))
         .thenReturn(Optional.of(booking));
 
-    IllegalArgumentException exceptionReturned =
+    BookingConflictException exceptionReturned =
         assertThrows(
-            IllegalArgumentException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
 
     assertEquals("You already have a booking for this slot.", exceptionReturned.getMessage());
     verify(bookingRepository, never()).save(any());
@@ -127,9 +142,9 @@ class SpeedbackServiceTest {
         .thenReturn(Optional.of(booking));
     when(teamMemberRepository.findById(any())).thenReturn(Optional.of(bookie));
 
-    IllegalArgumentException exceptionReturned =
+    BookingConflictException exceptionReturned =
         assertThrows(
-            IllegalArgumentException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
     assertEquals(
         "Prashant is already booked as a bookie in this slot.", exceptionReturned.getMessage());
     verify(bookingRepository, never()).save(any());
@@ -147,9 +162,9 @@ class SpeedbackServiceTest {
         .thenReturn(Optional.of(booking));
     when(teamMemberRepository.findById(any())).thenReturn(Optional.empty());
 
-    IllegalArgumentException exceptionReturned =
+    BookingNotFoundException exceptionReturned =
         assertThrows(
-            IllegalArgumentException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingNotFoundException.class, () -> speedbackService.createBooking(bookingRequest));
     assertEquals("Bookie not found.", exceptionReturned.getMessage());
     verify(bookingRepository, never()).save(any());
   }
@@ -171,9 +186,9 @@ class SpeedbackServiceTest {
     when(bookingRepository.findByBookerIdAndSlotNumber(2L, 3))
         .thenReturn(Optional.of(existingBooking));
 
-    IllegalArgumentException exception =
+    BookingConflictException exception =
         assertThrows(
-            IllegalArgumentException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
 
     assertEquals(
         "Prashant is not available in slot 3 because they have already booked John for that time.",
@@ -201,8 +216,8 @@ class SpeedbackServiceTest {
     when(bookingRepository.findByBookerIdAndSlotNumber(anyLong(), anyInt()))
         .thenReturn(Optional.empty());
 
-    IllegalArgumentException exception =
-        assertThrows(IllegalArgumentException.class, () -> speedbackService.deleteBooking(1L, 2));
+    BookingNotFoundException exception =
+        assertThrows(BookingNotFoundException.class, () -> speedbackService.deleteBooking(1L, 2));
 
     assertEquals("No booking found for booker in this slot.", exception.getMessage());
     verify(bookingRepository, never()).delete(any());

@@ -1,16 +1,21 @@
 package com.project.speedback.entity;
 
 import jakarta.persistence.*;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"booker", "bookie"})
 @Table(
     uniqueConstraints = {
       @UniqueConstraint(columnNames = {"booker_id", "slotNumber"}),
@@ -31,9 +36,15 @@ public class Booking {
 
   private int slotNumber;
 
-  public Booking(TeamMember booker, TeamMember bookie, int slotNumber) {
-    this.booker = booker;
-    this.bookie = bookie;
-    this.slotNumber = slotNumber;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Booking other)) return false;
+    return id != null && id.equals(other.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(getClass());
   }
 }

@@ -16,3 +16,9 @@ export interface SlotConfig {
   count: number;
   durationMinutes: number;
 }
+
+export interface FeatureFlag {
+  name: string;
+  active: boolean;
+}
+

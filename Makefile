@@ -6,7 +6,7 @@ help:
 	@echo "  make format-check  - Check if all Java files are correctly formatted."
 	@echo "  make build         - Build the Spring Boot application (includes format check)."
 	@echo "  make tests         - Run all tests."
-	@echo "  make start         - Start the Spring Boot application."
+	@echo "  make start         - Start the Spring Boot application (loads .env automatically)."
 	@echo "  make setup         - Configure git hooks and generate Gradle wrapper."
 
 format:
@@ -25,6 +25,7 @@ tests:
 	./gradlew clean test jacocoTestReport
 
 start:
+	@echo "Starting application (Spring Boot will load .env if present)..."
 	./gradlew bootRun
 
 setup:
