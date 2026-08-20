@@ -65,31 +65,31 @@ jobs:
           echo "Postgres did not become ready in time"
           exit 1
 
-      - name: Check backend formatting
+      - name: Check formatting
         run: ./gradlew spotlessCheck
 
-      - name: Run backend tests
+      - name: Run tests
         run: ./gradlew test --console=plain
 
-      - name: Enforce backend coverage gate (80%)
+      - name: Enforce coverage gate (80%)
         run: ./gradlew jacocoTestReport jacocoTestCoverageVerification --console=plain
 
-      - name: Publish backend test report
+      - name: Publish test report
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: Backend Test Results
+          name: Test Results
           path: build/test-results/test/*.xml
           reporter: java-junit
 
-      - name: Build backend
+      - name: Build
         run: ./gradlew assemble --console=plain
 
       - name: Upload JaCoCo HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: backend-jacoco-html-report
+          name: jacoco-html-report
           path: build/reports/jacoco/test/html
           if-no-files-found: warn
           retention-days: 3
