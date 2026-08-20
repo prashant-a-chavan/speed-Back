@@ -81,6 +81,8 @@ jobs:
           name: Test Results
           path: build/test-results/test/*.xml
           reporter: java-junit
+          list-suites: failed
+          list-tests: failed
 
       - name: Build
         run: ./gradlew assemble --console=plain
