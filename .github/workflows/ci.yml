@@ -58,7 +58,7 @@ jobs:
       - name: Wait for PostgreSQL
         run: |
           for i in {1..30}; do
-            pg_is ready -h localhost -p 5433 -U postgres -d speedback_db && echo "Postgres is ready" && exit 0
+            pg_isready -h localhost -p 5433 -U postgres -d speedback_db && echo "Postgres is ready" && exit 0
             echo "Waiting for Postgres..."
             sleep 2
           done
