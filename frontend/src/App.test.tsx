@@ -86,8 +86,3 @@ describe('App routing', () => {
     expect(mockModal).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
   });
 });
-
-
-
-
-

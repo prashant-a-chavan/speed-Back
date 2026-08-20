@@ -31,4 +31,3 @@ const useWebSocket = (wsUrl: string, onMessage: (bookings: Booking[]) => void): 
 };
 
 export default useWebSocket;
-

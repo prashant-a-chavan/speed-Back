@@ -21,4 +21,3 @@ export interface FeatureFlag {
   name: string;
   active: boolean;
 }
-

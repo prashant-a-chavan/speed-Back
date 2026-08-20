@@ -15,4 +15,3 @@ export const useFeatureFlag = (flagName: string): boolean => {
   const flags = useContext(FeatureFlagsContext);
   return flags[flagName] ?? false;
 };
-

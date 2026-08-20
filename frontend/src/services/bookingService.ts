@@ -13,4 +13,3 @@ export const createBooking = (
 
 export const removeBooking = (bookerId: number, slotNumber: number): Promise<AxiosResponse<void>> =>
   apiClient.delete(`/bookings/${bookerId}/${slotNumber}`);
-
