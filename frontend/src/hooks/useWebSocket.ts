@@ -1,17 +1,18 @@
 import { useEffect, useRef } from 'react';
-import { Client } from '@stomp/stompjs';
+import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { Booking } from '../types';
 
-const useWebSocket = (wsUrl, onMessage) => {
-  const stompClientRef = useRef(null);
+const useWebSocket = (wsUrl: string, onMessage: (bookings: Booking[]) => void): void => {
+  const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
     const client = new Client({
       webSocketFactory: () => new SockJS(wsUrl),
       onConnect: () => {
         console.log('WebSocket connected');
-        client.subscribe('/topic/bookings', (message) => {
-          onMessage(JSON.parse(message.body));
+        client.subscribe('/topic/bookings', (message: IMessage) => {
+          onMessage(JSON.parse(message.body) as Booking[]);
         });
       },
       onStompError: (frame) => {

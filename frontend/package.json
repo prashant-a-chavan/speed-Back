@@ -28,10 +28,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --check .",
-    "prettier:fix": "prettier --write .",
+    "format:fix": "prettier --write .",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
-    "validate": "yarn format:check && yarn lint:check"
+    "validate": "npm run format && npm run lint"
   },
   "eslintConfig": {
     "extends": [
@@ -51,7 +51,13 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(axios|@stomp/stompjs|sockjs-client)/)"
+    ]
+  },
   "devDependencies": {
+    "@types/sockjs-client": "^1.5.4",
     "prettier": "^3.6.2"
   }
 }

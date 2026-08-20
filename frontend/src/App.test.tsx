@@ -37,6 +37,10 @@ jest.mock('./pages/AboutPage.tsx', () => ({
   AboutPage: () => <div>About Page</div>,
 }));
 
+jest.mock('./services/configService', () => ({
+  getFeatureFlags: () => Promise.resolve({}),
+}));
+
 describe('App routing', () => {
   const baseHookState = {
     teamMembers: [],
@@ -82,8 +86,3 @@ describe('App routing', () => {
     expect(mockModal).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
   });
 });
-
-
-
-
-

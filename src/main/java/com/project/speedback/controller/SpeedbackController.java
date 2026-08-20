@@ -13,15 +13,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
 @Tag(
     name = "SpeedBack Operations",
     description = "Endpoints for managing team members and bookings")
@@ -104,15 +107,11 @@ public class SpeedbackController {
             content = @Content)
       })
   @PostMapping("/bookings")
-  public ResponseEntity<?> createBooking(@RequestBody BookingRequest request) {
-    try {
-      BookingDTO newBooking = speedbackService.createBooking(request);
-      // Notify all subscribers about the new booking
-      messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
-      return new ResponseEntity<>(newBooking, HttpStatus.CREATED);
-    } catch (IllegalArgumentException e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
+  public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingRequest request) {
+    BookingDTO newBooking = speedbackService.createBooking(request);
+    messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
+    log.debug("Broadcast booking update after create for slot {}", request.getSlotNumber());
+    return ResponseEntity.status(HttpStatus.CREATED).body(newBooking);
   }
 
   @Operation(
@@ -125,23 +124,22 @@ public class SpeedbackController {
             description = "Booking deleted successfully",
             content = @Content),
         @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request or booking not found",
+            responseCode = "404",
+            description = "Feature disabled or booking not found",
             content = @Content)
       })
   @DeleteMapping("/bookings/{bookerId}/{slotNumber}")
-  public ResponseEntity<?> deleteBooking(
+  public ResponseEntity<Void> deleteBooking(
       @PathVariable Long bookerId, @PathVariable int slotNumber) {
 
     if (!ServiceFeatures.REMOVE_BOOKINGS.isActive()) {
-      return new ResponseEntity<>("Delete feature is currently disabled", HttpStatus.NOT_FOUND);
+      throw new ResponseStatusException(
+          HttpStatus.NOT_FOUND, "Delete feature is currently disabled");
     }
-    try {
-      speedbackService.deleteBooking(bookerId, slotNumber);
-      messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } catch (IllegalArgumentException e) {
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
+
+    speedbackService.deleteBooking(bookerId, slotNumber);
+    messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
+    log.debug("Broadcast booking update after delete for slot {}", slotNumber);
+    return ResponseEntity.noContent().build();
   }
 }
