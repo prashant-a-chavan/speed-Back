@@ -17,6 +17,8 @@ import com.project.speedback.entity.TeamMember;
 import com.project.speedback.exception.BookingConflictException;
 import com.project.speedback.exception.BookingNotFoundException;
 import com.project.speedback.exception.GlobalExceptionHandler;
+import com.project.speedback.repository.TeamMemberRepository;
+import com.project.speedback.service.JwtService;
 import com.project.speedback.service.SpeedbackService;
 import com.project.speedback.toggles.ServiceFeatures;
 import java.util.List;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -35,6 +38,7 @@ import org.togglz.core.manager.FeatureManager;
 
 @WebMvcTest(SpeedbackController.class)
 @Import(GlobalExceptionHandler.class)
+@AutoConfigureMockMvc(addFilters = false)
 class SpeedbackControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -46,6 +50,10 @@ class SpeedbackControllerTest {
   @MockitoBean private SimpMessagingTemplate messagingTemplate;
 
   @MockitoBean private SlotConfiguration slotConfiguration;
+
+  @MockitoBean private JwtService jwtService;
+
+  @MockitoBean private TeamMemberRepository teamMemberRepository;
 
   @BeforeEach
   void setUp() {

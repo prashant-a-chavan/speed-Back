@@ -1,5 +1,6 @@
 package com.project.speedback.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,4 +23,11 @@ public class TeamMember {
 
   @Column(nullable = false, length = 255)
   private String name;
+
+  @Column(nullable = false, unique = true, length = 100)
+  private String username;
+
+  @JsonIgnore
+  @Column(name = "password_hash", nullable = false, length = 255)
+  private String passwordHash;
 }

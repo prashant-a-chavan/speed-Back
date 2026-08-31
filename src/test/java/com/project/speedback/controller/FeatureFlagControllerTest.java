@@ -4,21 +4,30 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.project.speedback.exception.GlobalExceptionHandler;
+import com.project.speedback.repository.TeamMemberRepository;
+import com.project.speedback.service.JwtService;
 import com.project.speedback.toggles.ServiceFeatures;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.togglz.core.context.FeatureContext;
 import org.togglz.core.manager.FeatureManager;
 
 @WebMvcTest(FeatureFlagController.class)
 @Import(GlobalExceptionHandler.class)
+@AutoConfigureMockMvc(addFilters = false)
 class FeatureFlagControllerTest {
 
   @Autowired private MockMvc mockMvc;
+
+  @MockitoBean private JwtService jwtService;
+
+  @MockitoBean private TeamMemberRepository teamMemberRepository;
 
   @Test
   void shouldReturnAllFeatureFlagsWithCorrectActiveState() throws Exception {
