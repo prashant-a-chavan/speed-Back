@@ -1,0 +1,19 @@
+# Gradle build output
+build/
+!build/libs/
+build/libs/*
+!build/libs/*.jar
+
+# IDE and VCS
+.git/
+.gitignore
+.idea/
+
+# Local development files
+*.log
+.env
+.env.*
+
+# Frontend / misc if present
+node_modules/
+

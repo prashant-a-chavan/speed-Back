@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -107,8 +108,9 @@ public class SpeedbackController {
             content = @Content)
       })
   @PostMapping("/bookings")
-  public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody BookingRequest request) {
-    BookingDTO newBooking = speedbackService.createBooking(request);
+  public ResponseEntity<BookingDTO> createBooking(
+      @Valid @RequestBody BookingRequest request, Principal principal) {
+    BookingDTO newBooking = speedbackService.createBooking(request, principal.getName());
     messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
     log.debug("Broadcast booking update after create for slot {}", request.getSlotNumber());
     return ResponseEntity.status(HttpStatus.CREATED).body(newBooking);
@@ -130,14 +132,14 @@ public class SpeedbackController {
       })
   @DeleteMapping("/bookings/{bookerId}/{slotNumber}")
   public ResponseEntity<Void> deleteBooking(
-      @PathVariable Long bookerId, @PathVariable int slotNumber) {
+      @PathVariable Long bookerId, @PathVariable int slotNumber, Principal principal) {
 
     if (!ServiceFeatures.REMOVE_BOOKINGS.isActive()) {
       throw new ResponseStatusException(
           HttpStatus.NOT_FOUND, "Delete feature is currently disabled");
     }
 
-    speedbackService.deleteBooking(bookerId, slotNumber);
+    speedbackService.deleteBooking(bookerId, slotNumber, principal.getName());
     messagingTemplate.convertAndSend("/topic/bookings", speedbackService.getAllBookings());
     log.debug("Broadcast booking update after delete for slot {}", slotNumber);
     return ResponseEntity.noContent().build();
