@@ -3,6 +3,7 @@ package com.project.speedback.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.togglz.core.context.FeatureContext;
@@ -103,39 +105,42 @@ class SpeedbackControllerTest {
     BookingDTO created = new BookingDTO(7L, 1L, "Booker", 2L, "Bookie", 2);
     List<BookingDTO> allBookings = List.of(created);
 
-    when(speedbackService.createBooking(any(BookingRequest.class))).thenReturn(created);
+    when(speedbackService.createBooking(any(BookingRequest.class), eq("booker.user")))
+        .thenReturn(created);
     when(speedbackService.getAllBookings()).thenReturn(allBookings);
 
     mockMvc
         .perform(
             post("/api/bookings")
+                .principal(() -> "booker.user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").value(7L))
         .andExpect(jsonPath("$.bookerName").value("Booker"));
 
-    verify(speedbackService).createBooking(any(BookingRequest.class));
+    verify(speedbackService).createBooking(any(BookingRequest.class), eq("booker.user"));
     verify(speedbackService).getAllBookings();
-    verify(messagingTemplate).convertAndSend(eq("/topic/bookings"), eq(allBookings));
+    verify(messagingTemplate).convertAndSend("/topic/bookings", allBookings);
   }
 
   @Test
   void shouldReturnBadRequestWhenCreateBookingFailsValidation() throws Exception {
     BookingRequest request =
         BookingRequest.builder().bookerId(1L).bookieId(1L).slotNumber(2).build();
-    when(speedbackService.createBooking(any(BookingRequest.class)))
+    when(speedbackService.createBooking(any(BookingRequest.class), eq("booker.user")))
         .thenThrow(new BookingConflictException("Invalid booking request"));
 
     mockMvc
         .perform(
             post("/api/bookings")
+                .principal(() -> "booker.user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isBadRequest())
         .andExpect(content().string("Invalid booking request"));
 
-    verify(speedbackService).createBooking(any(BookingRequest.class));
+    verify(speedbackService).createBooking(any(BookingRequest.class), eq("booker.user"));
     verify(speedbackService, never()).getAllBookings();
     verify(messagingTemplate, never()).convertAndSend(eq("/topic/bookings"), any(Object.class));
   }
@@ -152,12 +157,12 @@ class SpeedbackControllerTest {
                 .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isBadRequest());
 
-    verify(speedbackService, never()).createBooking(any());
+    verify(speedbackService, never()).createBooking(any(), any(String.class));
   }
 
   @Test
   void shouldReturnNotFoundWhenDeleteFeatureIsDisabled() throws Exception {
-    FeatureManager featureManager = org.mockito.Mockito.mock(FeatureManager.class);
+    FeatureManager featureManager = mock(FeatureManager.class);
     when(featureManager.isActive(ServiceFeatures.REMOVE_BOOKINGS)).thenReturn(false);
 
     try (MockedStatic<FeatureContext> mockedFeatureContext =
@@ -166,7 +171,7 @@ class SpeedbackControllerTest {
 
       mockMvc.perform(delete("/api/bookings/1/2")).andExpect(status().isNotFound());
 
-      verify(speedbackService, never()).deleteBooking(any(), any(Integer.class));
+      verify(speedbackService, never()).deleteBooking(any(), any(Integer.class), any(String.class));
       verify(speedbackService, never()).getAllBookings();
     }
   }
@@ -174,7 +179,7 @@ class SpeedbackControllerTest {
   @Test
   void shouldDeleteBookingAndBroadcastWhenFeatureIsEnabled() throws Exception {
     BookingDTO booking = new BookingDTO(1L, 1L, "Booker", 2L, "Bookie", 1);
-    FeatureManager featureManager = org.mockito.Mockito.mock(FeatureManager.class);
+    FeatureManager featureManager = mock(FeatureManager.class);
     when(featureManager.isActive(ServiceFeatures.REMOVE_BOOKINGS)).thenReturn(true);
     when(speedbackService.getAllBookings()).thenReturn(List.of(booking));
 
@@ -182,32 +187,77 @@ class SpeedbackControllerTest {
         org.mockito.Mockito.mockStatic(FeatureContext.class)) {
       mockedFeatureContext.when(FeatureContext::getFeatureManager).thenReturn(featureManager);
 
-      mockMvc.perform(delete("/api/bookings/1/1")).andExpect(status().isNoContent());
+      mockMvc
+          .perform(delete("/api/bookings/1/1").principal(() -> "booker.user"))
+          .andExpect(status().isNoContent());
 
-      verify(speedbackService).deleteBooking(1L, 1);
+      verify(speedbackService).deleteBooking(1L, 1, "booker.user");
       verify(speedbackService).getAllBookings();
-      verify(messagingTemplate).convertAndSend(eq("/topic/bookings"), eq(List.of(booking)));
+      verify(messagingTemplate).convertAndSend("/topic/bookings", List.of(booking));
     }
   }
 
   @Test
   void shouldReturnNotFoundWhenDeleteBookingThrowsNotFound() throws Exception {
-    FeatureManager featureManager = org.mockito.Mockito.mock(FeatureManager.class);
+    FeatureManager featureManager = mock(FeatureManager.class);
     when(featureManager.isActive(ServiceFeatures.REMOVE_BOOKINGS)).thenReturn(true);
     doThrow(new BookingNotFoundException("No booking found for booker in this slot."))
         .when(speedbackService)
-        .deleteBooking(1L, 9);
+        .deleteBooking(1L, 9, "booker.user");
 
     try (MockedStatic<FeatureContext> mockedFeatureContext =
         org.mockito.Mockito.mockStatic(FeatureContext.class)) {
       mockedFeatureContext.when(FeatureContext::getFeatureManager).thenReturn(featureManager);
 
       mockMvc
-          .perform(delete("/api/bookings/1/9"))
+          .perform(delete("/api/bookings/1/9").principal(() -> "booker.user"))
           .andExpect(status().isNotFound())
           .andExpect(content().string("No booking found for booker in this slot."));
 
-      verify(speedbackService).deleteBooking(1L, 9);
+      verify(speedbackService).deleteBooking(1L, 9, "booker.user");
+      verify(speedbackService, never()).getAllBookings();
+    }
+  }
+
+  @Test
+  void shouldReturnForbiddenWhenCreateBookingTargetsAnotherUser() throws Exception {
+    BookingRequest request =
+        BookingRequest.builder().bookerId(2L).bookieId(3L).slotNumber(2).build();
+    when(speedbackService.createBooking(any(BookingRequest.class), eq("booker.user")))
+        .thenThrow(
+            new AccessDeniedException("You can only book or cancel slots for your own account."));
+
+    mockMvc
+        .perform(
+            post("/api/bookings")
+                .principal(() -> "booker.user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isForbidden())
+        .andExpect(content().string("You can only book or cancel slots for your own account."));
+
+    verify(speedbackService).createBooking(any(BookingRequest.class), eq("booker.user"));
+    verify(speedbackService, never()).getAllBookings();
+  }
+
+  @Test
+  void shouldReturnForbiddenWhenDeleteBookingTargetsAnotherUser() throws Exception {
+    FeatureManager featureManager = mock(FeatureManager.class);
+    when(featureManager.isActive(ServiceFeatures.REMOVE_BOOKINGS)).thenReturn(true);
+    doThrow(new AccessDeniedException("You can only book or cancel slots for your own account."))
+        .when(speedbackService)
+        .deleteBooking(2L, 1, "booker.user");
+
+    try (MockedStatic<FeatureContext> mockedFeatureContext =
+        org.mockito.Mockito.mockStatic(FeatureContext.class)) {
+      mockedFeatureContext.when(FeatureContext::getFeatureManager).thenReturn(featureManager);
+
+      mockMvc
+          .perform(delete("/api/bookings/2/1").principal(() -> "booker.user"))
+          .andExpect(status().isForbidden())
+          .andExpect(content().string("You can only book or cancel slots for your own account."));
+
+      verify(speedbackService).deleteBooking(2L, 1, "booker.user");
       verify(speedbackService, never()).getAllBookings();
     }
   }
