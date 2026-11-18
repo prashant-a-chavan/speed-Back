@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:speedback;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+
+# Keep test startup independent from env/.env values
+cors:
+  allowed-origins: http://localhost:3000
+
+security:
+  jwt:
+    secret: test-jwt-secret-key-with-at-least-32-characters
+    expiration-ms: 3600000
+
