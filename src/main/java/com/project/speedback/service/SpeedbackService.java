@@ -11,6 +11,7 @@ import com.project.speedback.repository.TeamMemberRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,9 @@ public class SpeedbackService {
   }
 
   @Transactional
-  public BookingDTO createBooking(BookingRequest request) {
+  public BookingDTO createBooking(BookingRequest request, String authenticatedUsername) {
+    assertBookingOwnership(authenticatedUsername, request.getBookerId());
+
     if (request.getBookerId().equals(request.getBookieId())) {
       throw new BookingConflictException("You cannot book a session with yourself.");
     }
@@ -96,7 +99,9 @@ public class SpeedbackService {
   }
 
   @Transactional
-  public void deleteBooking(Long bookerId, int slotNumber) {
+  public void deleteBooking(Long bookerId, int slotNumber, String authenticatedUsername) {
+    assertBookingOwnership(authenticatedUsername, bookerId);
+
     Booking booking =
         bookingRepository
             .findByBookerIdAndSlotNumber(bookerId, slotNumber)
@@ -104,6 +109,20 @@ public class SpeedbackService {
                 () -> new BookingNotFoundException("No booking found for booker in this slot."));
     bookingRepository.delete(booking);
     log.info("Booking deleted: bookerId={}, slot={}", bookerId, slotNumber);
+  }
+
+  private void assertBookingOwnership(String authenticatedUsername, Long requestedBookerId) {
+    TeamMember authenticatedMember =
+        teamMemberRepository
+            .findByUsernameIgnoreCase(authenticatedUsername)
+            .orElseThrow(
+                () ->
+                    new AccessDeniedException(
+                        "You can only book or cancel slots for your own account."));
+
+    if (!authenticatedMember.getId().equals(requestedBookerId)) {
+      throw new AccessDeniedException("You can only book or cancel slots for your own account.");
+    }
   }
 
   private BookingDTO convertToDto(Booking booking) {

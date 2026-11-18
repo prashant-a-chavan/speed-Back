@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 class SpeedbackServiceTest {
@@ -40,7 +41,10 @@ class SpeedbackServiceTest {
     ModelMapper modelMapper = new ModelMapper();
     speedbackService = new SpeedbackService(teamMemberRepository, bookingRepository, modelMapper);
 
-    teamMember = TeamMember.builder().id(1L).name("Test").build();
+    teamMember = TeamMember.builder().id(1L).name("Test").username("test.user").build();
+    lenient()
+        .when(teamMemberRepository.findByUsernameIgnoreCase("test.user"))
+        .thenReturn(Optional.of(teamMember));
   }
 
   @Test
@@ -52,7 +56,7 @@ class SpeedbackServiceTest {
 
     assertEquals(1, allMembers.size());
     assertTrue(allMembers.contains(teamMember));
-    assertThat(allMembers.get(0).getName(), is(equalTo("Test")));
+    assertThat(allMembers.getFirst().getName(), is(equalTo("Test")));
   }
 
   @Test
@@ -64,9 +68,9 @@ class SpeedbackServiceTest {
     List<BookingDTO> allBookings = speedbackService.getAllBookings();
 
     assertEquals(1, allBookings.size());
-    assertEquals("Test", allBookings.get(0).getBookieName());
-    assertThat(allBookings.get(0).getBookerName(), is(equalTo("Test")));
-    assertEquals(2, allBookings.get(0).getSlotNumber());
+    assertEquals("Test", allBookings.getFirst().getBookieName());
+    assertThat(allBookings.getFirst().getBookerName(), is(equalTo("Test")));
+    assertEquals(2, allBookings.getFirst().getSlotNumber());
   }
 
   @Test
@@ -86,7 +90,7 @@ class SpeedbackServiceTest {
     when(teamMemberRepository.findById(any())).thenReturn(Optional.of(teamMember));
     when(bookingRepository.save(any())).thenReturn(booking);
 
-    BookingDTO createdBooking = speedbackService.createBooking(bookingRequest);
+    BookingDTO createdBooking = speedbackService.createBooking(bookingRequest, "test.user");
 
     assertEquals(1L, createdBooking.getBookerId());
     assertEquals(2L, createdBooking.getBookieId());
@@ -103,7 +107,8 @@ class SpeedbackServiceTest {
 
     BookingConflictException exception =
         assertThrows(
-            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class,
+            () -> speedbackService.createBooking(bookingRequest, "test.user"));
 
     assertEquals("You cannot book a session with yourself.", exception.getMessage());
     verify(bookingRepository, never()).save(any());
@@ -124,7 +129,8 @@ class SpeedbackServiceTest {
 
     BookingConflictException exceptionReturned =
         assertThrows(
-            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class,
+            () -> speedbackService.createBooking(bookingRequest, "test.user"));
 
     assertEquals("You already have a booking for this slot.", exceptionReturned.getMessage());
     verify(bookingRepository, never()).save(any());
@@ -144,7 +150,8 @@ class SpeedbackServiceTest {
 
     BookingConflictException exceptionReturned =
         assertThrows(
-            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class,
+            () -> speedbackService.createBooking(bookingRequest, "test.user"));
     assertEquals(
         "Prashant is already booked as a bookie in this slot.", exceptionReturned.getMessage());
     verify(bookingRepository, never()).save(any());
@@ -164,7 +171,8 @@ class SpeedbackServiceTest {
 
     BookingNotFoundException exceptionReturned =
         assertThrows(
-            BookingNotFoundException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingNotFoundException.class,
+            () -> speedbackService.createBooking(bookingRequest, "test.user"));
     assertEquals("Bookie not found.", exceptionReturned.getMessage());
     verify(bookingRepository, never()).save(any());
   }
@@ -188,7 +196,8 @@ class SpeedbackServiceTest {
 
     BookingConflictException exception =
         assertThrows(
-            BookingConflictException.class, () -> speedbackService.createBooking(bookingRequest));
+            BookingConflictException.class,
+            () -> speedbackService.createBooking(bookingRequest, "test.user"));
 
     assertEquals(
         "Prashant is not available in slot 3 because they have already booked John for that time.",
@@ -205,7 +214,7 @@ class SpeedbackServiceTest {
         .thenReturn(Optional.of(booking));
     doNothing().when(bookingRepository).delete(any());
 
-    speedbackService.deleteBooking(1L, 2);
+    speedbackService.deleteBooking(1L, 2, "test.user");
 
     verify(bookingRepository).delete(booking);
     verify(bookingRepository, never()).save(any());
@@ -217,7 +226,9 @@ class SpeedbackServiceTest {
         .thenReturn(Optional.empty());
 
     BookingNotFoundException exception =
-        assertThrows(BookingNotFoundException.class, () -> speedbackService.deleteBooking(1L, 2));
+        assertThrows(
+            BookingNotFoundException.class,
+            () -> speedbackService.deleteBooking(1L, 2, "test.user"));
 
     assertEquals("No booking found for booker in this slot.", exception.getMessage());
     verify(bookingRepository, never()).delete(any());
@@ -241,5 +252,29 @@ class SpeedbackServiceTest {
     assertEquals("Test", bookingDTO.getBookerName());
     assertEquals("Test", bookingDTO.getBookieName());
     assertEquals(2, bookingDTO.getSlotNumber());
+  }
+
+  @Test
+  void shouldRejectCreateBookingForDifferentAuthenticatedUser() {
+    BookingRequest bookingRequest =
+        BookingRequest.builder().bookerId(2L).bookieId(3L).slotNumber(1).build();
+
+    AccessDeniedException exception =
+        assertThrows(
+            AccessDeniedException.class,
+            () -> speedbackService.createBooking(bookingRequest, "test.user"));
+
+    assertEquals("You can only book or cancel slots for your own account.", exception.getMessage());
+    verify(bookingRepository, never()).save(any());
+  }
+
+  @Test
+  void shouldRejectDeleteBookingForDifferentAuthenticatedUser() {
+    AccessDeniedException exception =
+        assertThrows(
+            AccessDeniedException.class, () -> speedbackService.deleteBooking(2L, 1, "test.user"));
+
+    assertEquals("You can only book or cancel slots for your own account.", exception.getMessage());
+    verify(bookingRepository, never()).delete(any());
   }
 }
